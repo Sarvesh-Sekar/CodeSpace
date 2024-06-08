@@ -3,28 +3,32 @@ const  runFile = require('compile-run')
 const runSource = require('compile-run')
 const path = require('path')
 
-const runC = async function(req, res, next)
-{
-    try{
-        const run_c = await c.runFile(path.join(__dirname,'..','a.c'),{
-            compilationPath : 'C:/MinGW/bin/gcc.exe'
-        })
-        const result_c= run_c.stdout
-        return result_c
+const runC = async (name, ext,input) => {
+    try {
+        const filepath = path.join(__dirname,'..','files',`${name}${ext}`);
+        const run_c = await c.runFile(filepath, {
+            compilationPath: 'C:/MinGW/bin/gcc.exe',
+            stdin:input
+        });
+        const result_c = run_c.stdout || run_c.std;
+        console.log(result_c);
+        console.log(filepath)
+        return result_c;
+    } catch (err) {
+        console.log(err);
+        throw err; // Rethrow the error to be caught in the outer try...catch
     }
-    catch(err){
-        console.log(err)
-    }
-    
-}
+};
 
-async function runCpp()
+const  runCpp= async(name,ext,input)=>
 {
     try{
-        const run_cpp = await cpp.runFile(path.join(__dirname,'..','a.cpp'),{
-            compilationPath:'C:/MinGW/bin/c++.exe'
+        const filepath = path.join(__dirname,'..','files',`${name}${ext}`);
+        const run_cpp = await cpp.runFile(filepath,{
+            compilationPath:'C:/MinGW/bin/c++.exe',
+            stdin:input
         }) 
-        const result_cpp= run_cpp.stdout
+        const result_cpp= run_cpp.stdout || run_cpp.stderr
         return result_cpp
     }
     catch (err) {
@@ -32,16 +36,20 @@ async function runCpp()
     }
 }
 
-async function runPython()
+const runPython=async(name,ext,input)=>
 {
     try{
-        const run_python = await python.runFile(path.join(__dirname,'..','a.py'),{
-            executionPath: 'C:/Users/sarve_71cseos/AppData/Local/Programs/Python/Python312/python.exe'
-        })
+        const filepath = path.join(__dirname,'..','files',`${name}${ext}`);
+        const run_python = await python.runFile(filepath,{
+            executionPath: 'C:/Users/sarve_71cseos/AppData/Local/Programs/Python/Python312/python.exe',
+            stdin:input
+        },
+    )
         
-         const result_python =  run_python.stdout
-         
+         const result_python =  run_python.stdout|| run_python.stderr;
          return result_python
+         
+        
     }catch(err)
     
     {
@@ -49,41 +57,41 @@ async function runPython()
     }
 }
 
-async function runJava()
-{
-    try{
-        const run_java = await java.runFile(path.join(__dirname,'..','a.java'),{
-            
-            compilationPath:'C:/Program Files/Common Files/Oracle/Java/javapath/javac.exe',
-            executionPath:'C:/Program Files/Common Files/Oracle/Java/javapath/java.exe'
-        })
-        const result_java =  run_java.stdout
-        return result_java
-    }catch(err)
-    {
-        console.log(err)
-    }
-}
+const runJava = async (name, ext,input) => {
+    let result_java;
+    try {
+        const filepath = path.join(__dirname, '..', 'files', `${name}${ext}`);
+        const run_java = await java.runFile(filepath, {
+            compilationPath: 'C:/Program Files/Common Files/Oracle/Java/javapath/javac.exe',
+            executionPath: 'C:/Program Files/Common Files/Oracle/Java/javapath/java.exe',
+            stdin:input
+        });
 
-async function runJs()
+        result_java = run_java.stdout||run_java.stderr;
+    } catch (err) {
+        result_java = err.stderr || err.message; // Return standard error or error message
+        
+    }
+    return result_java;
+};
+
+const runJs = async(name,ext,input)=>
 {
     try{
-        const run_js = await node.runFile(path.join(__dirname,'..','a.js'),{
-                   executionPath:'C:/Users/sarve_71cseos/node_modules/node/bin/node.exe'
+        const filepath = path.join(__dirname,'..','files',`${name}${ext}`);
+        const run_js = await node.runFile(filepath,{
+                   executionPath:'C:/Users/sarve_71cseos/node_modules/node/bin/node.exe',
+                   stdin:input
         }) 
-         const result_js=run_js.stdout
-          return result_js
+         const result_js=run_js.stdout||run_js.stderr
+        return result_js
     }catch(err)
     {
         console.log(err)
     }
 }
 
- runC()
-// runCpp()
-// runPython()
-// runJava()
-// runJs()
+
 module.exports = {runC,runCpp,runPython,runJava,runJs}
 
 
