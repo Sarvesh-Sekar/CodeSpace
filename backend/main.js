@@ -4,6 +4,10 @@ const runFile = require('compile-run')
 const runSource = require('compile-run')
 const app = express();
 const {runC,runCpp,runPython,runJava,runJs} = require('./Controller/compile')
+const Test = require('./models/model')
+const mongoose = require('mongoose')
+
+mongoose.connect('mongodb://localhost:27017/testDB');
 
 const cors = require('cors');
 app.use(cors());
